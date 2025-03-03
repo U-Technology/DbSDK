@@ -1,12 +1,12 @@
 <?php
 
-namespace DAL;
+namespace src\DAL;
 
-use Config\ParameterDBMySQL;
-use Enum\ParamTypeQuery;
 use Exception;
 use PDO;
 use PDOException;
+use src\Config\ParameterDBMySQL;
+use src\Enum\ParamTypeQuery;
 
 class Database
 {

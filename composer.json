@@ -1,4 +1,16 @@
 {
+  "name": "utechnology/dbsdk",
+  "description": "SDK tools for using DB from php object",
+  "autoload": {
+    "psr-4": {
+      "UTechnology\\DbSDK\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "U-Technology"
+    }
+  ],
   "require": {
     "ext-pdo": "*"
   }

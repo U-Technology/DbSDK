@@ -1,6 +1,6 @@
 <?php
 
-namespace DAL;
+namespace src\DAL;
 
 class EntityDB
 {

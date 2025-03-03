@@ -1,6 +1,8 @@
 <?php
 
-use Enum\ParamTypeQuery;
+namespace src;
+
+use src\Enum\ParamTypeQuery;
 
 class ParameterQuery
 {
@@ -8,7 +10,8 @@ class ParameterQuery
     public $Value;
     public ParamTypeQuery $ParamType;
 
-    public function setParameterType($typeValue) :void{
+    public function setParameterType($typeValue): void
+    {
         if (!$typeValue) {
             $this->ParamType = ParamTypeQuery::String;
         }
