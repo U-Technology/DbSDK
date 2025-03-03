@@ -1,6 +1,7 @@
 {
   "name": "utechnology/dbsdk",
   "description": "SDK tools for using DB from php object",
+  "type": "library",
   "autoload": {
     "psr-4": {
       "UTechnology\\DbSDK\\": "src/"
