@@ -1,8 +1,9 @@
 <?php
 
-namespace src;
+namespace UTechnology\DbSDK;
 
 use src\DAL\Database;
+use src\ParameterQuery;
 
 abstract class __EntityDB
 {
@@ -22,6 +23,12 @@ abstract class __EntityDB
     static array $__paramsDelete = [];
     static string $__fieldAutoIncrement = '';
     static string $__fieldNamePrimaryKey = '';
+
+    static string $__querySelectWithoutWhere = '';
+    public static function __getQuerySelectWithoutWhere(): string
+    {
+        return self::$__querySelectWithoutWhere;
+    }
 
     static bool $__getLastID;
     static bool $__isNewRecord = true;
@@ -62,6 +69,7 @@ abstract class __EntityDB
         }
 
         self::$__querySelect = 'SELECT * FROM ' . self::$attributeClass[self::$__attributeNameForTable] . ' WHERE ' . self::$__fieldNamePrimaryKey . ' = :' . self::$__fieldNamePrimaryKey;
+        self::$__querySelectWithoutWhere = 'SELECT * FROM ' . self::$attributeClass[self::$__attributeNameForTable];
         self::$__paramSelect = new ParameterQuery();
         self::$__paramSelect->Name = self::$__fieldNamePrimaryKey;
         self::$__paramSelect->ParamType = self::$__propertyType[self::$__fieldNamePrimaryKey];
@@ -224,6 +232,8 @@ WHERE ' . self::$__fieldNamePrimaryKey . ' = :' . self::$__fieldNamePrimaryKey;
             }
         }
     }
+
+
 
 
     /**Return insert command string
