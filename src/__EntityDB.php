@@ -7,11 +7,13 @@ use src\ParameterQuery;
 
 abstract class __EntityDB
 {
-    static array $attributeMap = []; // mapping attribute -> property
-    static array $__propertyType = [];
+    //static array $attributeMap = []; // mapping attribute -> property
+    protected static array $__attributesMap = [];
+    //static array $__propertyType = [];
+    protected static array $__propertiesType = [];
     static array $attributeClass = [];
-    static string $__querySelect = '';
-    static ParameterQuery $__paramSelect;
+    protected static array $__selectQueries = [];
+    protected static array $__selectParams = [];
     static string $__queryInsert = '';
     /** @var ParameterQuery[] */
     static array $__paramsInsert = [];
@@ -24,10 +26,10 @@ abstract class __EntityDB
     static string $__fieldAutoIncrement = '';
     static string $__fieldNamePrimaryKey = '';
 
-    static string $__querySelectWithoutWhere = '';
-    public static function __getQuerySelectWithoutWhere(): string
-    {
-        return self::$__querySelectWithoutWhere;
+    protected static array $__selectWithoutWhereQueries = [];
+    public static function __getSelectWithoutWhereQuery() :string{
+        self::createQuerySelect();
+        return self::$__selectWithoutWhereQueries[static::class];
     }
 
     static bool $__getLastID;
@@ -68,12 +70,26 @@ abstract class __EntityDB
             return;
         }
 
-        self::$__querySelect = 'SELECT * FROM ' . self::$attributeClass[self::$__attributeNameForTable] . ' WHERE ' . self::$__fieldNamePrimaryKey . ' = :' . self::$__fieldNamePrimaryKey;
-        self::$__querySelectWithoutWhere = 'SELECT * FROM ' . self::$attributeClass[self::$__attributeNameForTable];
-        self::$__paramSelect = new ParameterQuery();
-        self::$__paramSelect->Name = self::$__fieldNamePrimaryKey;
-        self::$__paramSelect->ParamType = self::$__propertyType[self::$__fieldNamePrimaryKey];
-        self::$__paramSelect->Value = $primaryKey;
+        if (!isset(self::$__selectQueries[static::class])){
+            // create query for class
+            self::createQuerySelect();
+            $querySelect = self::$__selectWithoutWhereQueries[static::class];
+            $querySelect = $querySelect . ' WHERE ' . self::$__fieldNamePrimaryKey . ' = :' . self::$__fieldNamePrimaryKey;
+
+            $parameter = new ParameterQuery();
+            $parameter->Name = self::$__fieldNamePrimaryKey;
+            $parameter->ParamType = self::$__propertyType[self::$__fieldNamePrimaryKey];
+            $parameter->Value = $primaryKey;
+
+            self::$__selectParams[static::class] = $parameter;
+        }
+    }
+
+    private static function createQuerySelect(): void
+    {
+        if (!isset(self::$__selectWithoutWhereQueries[static::class])){
+            self::$__selectWithoutWhereQueries[static::class] = 'SELECT * FROM ' . self::$attributeClass[self::$__attributeNameForTable];
+        }
     }
 
     private function CreateInsertCommand(): void
@@ -204,12 +220,15 @@ WHERE ' . self::$__fieldNamePrimaryKey . ' = :' . self::$__fieldNamePrimaryKey;
 
     private function initializeAttributeMap(): void
     {
-        if (array_count_values(self::$attributeMap) != 0) {
-            return;
+        if (isset(self::$__attributesMap[static::class])){
+            if (array_count_values(self::$__attributesMap[static::class]) != 0) {
+                return;
+            }
         }
+
         $reflection = new \ReflectionClass($this);
 
-        // Attributi della classe
+        // class attribute
         foreach ($reflection->getAttributes() as $attribute) {
             $instance = $attribute->newInstance();
             if ($instance instanceof \TableName) {
@@ -218,12 +237,14 @@ WHERE ' . self::$__fieldNamePrimaryKey . ' = :' . self::$__fieldNamePrimaryKey;
         }
 
 
+        // property attribute
         foreach ($reflection->getProperties() as $property) {
             foreach ($property->getAttributes() as $attribute) {
                 $instance = $attribute->newInstance();
                 if ($instance instanceof \FieldName) {
-                    self::$attributeMap[$instance->GetFieldName()] = $property->getName();
-                    self::$__propertyType[$instance->GetFieldName()] = $property->getType();
+                    self::$__attributesMap[static::class] = [$instance->GetFieldName() => $property->getName()];
+                    //self::$__propertyType[$instance->GetFieldName()] = $property->getType();
+                    self::$__propertiesType[static::class] = [$instance->GetFieldName() => $property->getType()];
                 } else if ($instance instanceof \IsAutoIncrement) {
                     self::$__fieldAutoIncrement = $property->getName();
                 } else if ($instance instanceof \IsPrimaryKeyField) {
