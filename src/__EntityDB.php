@@ -246,6 +246,7 @@ WHERE ' . self::$__fieldNamePrimaryKey . ' = :' . self::$__fieldNamePrimaryKey;
                     //self::$__propertyType[$instance->GetFieldName()] = $property->getType();
                     self::$__propertiesType[static::class] = [$instance->GetFieldName() => $property->getType()];
                 } else if ($instance instanceof \IsAutoIncrement) {
+                    //  da sistemare ancora come array
                     self::$__fieldAutoIncrement = $property->getName();
                 } else if ($instance instanceof \IsPrimaryKeyField) {
                     self::$__fieldNamePrimaryKey = $property->getName();
