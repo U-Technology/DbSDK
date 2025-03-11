@@ -1,14 +1,15 @@
 <?php
 
-namespace src\DAL;
+namespace UTechnology\DbSDK\DAL\MySQL;
 
 use Exception;
 use PDO;
 use PDOException;
 use src\Config\ParameterDBMySQL;
 use src\Enum\ParamTypeQuery;
+use UTechnology\DbSDK\DAL\IDatabase;
 
-class Database
+class Database implements IDatabase
 {
     private PDO $pdo;
 
@@ -25,10 +26,11 @@ class Database
     /**Execute select statement for query in input and returns first record founded
      * @param string $query
      * @param array $params
-     * @return mixed|void
+     * @return mixed
      * @throws Exception
      */
-    public function selectFirst(string $query = "", array $params = []){
+    public function selectFirst(string $query = "", array $params = []): mixed
+    {
         try {
             $list = $this->executeStatement( $query , $params );
             return $list[0] ?? null;
@@ -43,7 +45,7 @@ class Database
      * @return array Array of object loaded from DB
      * @throws Exception
      */
-    public function select(string $query = "" , array $params = [])
+    public function select(string $query = "" , array $params = []): array
     {
         try {
             return $this->executeStatement( $query , $params );

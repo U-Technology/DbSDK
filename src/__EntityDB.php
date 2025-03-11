@@ -2,8 +2,8 @@
 
 namespace UTechnology\DbSDK;
 
-use src\DAL\Database;
 use src\ParameterQuery;
+use UTechnology\DbSDK\DAL\MySQL\Database;
 
 abstract class __EntityDB
 {
@@ -339,7 +339,7 @@ WHERE ' . self::getPrimaryKey() . ' = :' . self::getPrimaryKey();
 
     /* CRUD operation*/
 
-    public function __Save()
+    private function __SavePrivate($db): void
     {
         // setting parameters DB with properties values of object
         $reflection = new \ReflectionClass($this);
@@ -352,7 +352,7 @@ WHERE ' . self::getPrimaryKey() . ' = :' . self::getPrimaryKey();
                 $param->Value = $property->getValue($this);
             }
 
-            $db = new Database();
+            //$db = new Database();
 
             if (!$this->__getLastID) {
                 // no autoincrement field
@@ -364,7 +364,7 @@ WHERE ' . self::getPrimaryKey() . ' = :' . self::getPrimaryKey();
                 $propertyID->setValue($this, $lastValue);
             }
 
-            $db = null;
+            //$db = null;
         } else {
             // is an existing record, execute update statement
             foreach (self::getParamUpdate() as $param) {
@@ -373,22 +373,41 @@ WHERE ' . self::getPrimaryKey() . ' = :' . self::getPrimaryKey();
                 $param->Value = $property->getValue($this);
             }
 
-            $db = new Database();
+            //$db = new Database();
 
             $db->Execute($this->__getUpdateCommand(), self::getParamUpdate());
 
-            $db = null;
+            //$db = null;
         }
 
     }
 
-    private function __Load()
-    {
+    /**Save the object into DB
+     * @return void
+     */
+    public function __Save(): void{
         $db = new Database();
-
-        $dbObject = $db->selectFirst(self::__getSelectCommand_singleRecord(), [self::getParamSelect()]);
-        $this->populateFromDB($dbObject);
-
+        $this->__SavePrivate($db);
         $db = null;
+    }
+
+    /**Load single record from DB
+     * @param mixed $idPrimaryKey
+     * @return void
+     * @throws \Exception
+     */
+    private function __Load(mixed $idPrimaryKey): void
+    {
+        if ($idPrimaryKey instanceof self::getPropertyType()[self::getPrimaryKey()]) {
+            $db = new Database();
+
+            self::getParamSelect()->Value = $idPrimaryKey;
+
+            $dbObject = $db->selectFirst(self::__getSelectCommand_singleRecord(), [self::getParamSelect()]);
+            $this->populateFromDB($dbObject);
+
+            $db = null;
+        }
+
     }
 }

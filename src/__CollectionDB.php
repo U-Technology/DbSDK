@@ -4,7 +4,7 @@ namespace UTechnology\DbSDK;
 
 use ArrayObject;
 use InvalidArgumentException;
-use src\DAL\Database;
+use UTechnology\DbSDK\DAL\MySQL\Database;
 
 abstract class __CollectionDB extends ArrayObject
 {
@@ -55,24 +55,74 @@ abstract class __CollectionDB extends ArrayObject
 
 
     // Section for DB
-    static string $__sqlSelect = '';
-
-    public function __loadAll(){
-        if (self::$allowedType::__getQuerySelectWithoutWhere() === ''){
-            self::$__sqlSelect = (new self::$allowedType())::__getQuerySelectWithoutWhere();
+    protected static array $__selectQueries = [];
+    private static function __getQuerySelect(){
+        if (isset(self::$__selectQueries[static::class])){
+            return self::$__selectQueries[static::class];
         }
-        self::$__sqlSelect = self::$allowedType::__getQuerySelectWithoutWhere();
+        return '';
+    }
+
+    protected static function __checkSqlSelect(): void
+    {
+        if (self::$allowedType::__getQuerySelectWithoutWhere() === ''){
+            self::$__selectQueries[static::class] = (new self::$allowedType())::__getQuerySelectWithoutWhere();
+            return;
+        }
+        self::$__selectQueries[static::class] = self::$allowedType::__getQuerySelectWithoutWhere();
+    }
+
+    public function __loadAll(): void
+    {
+        self::__checkSqlSelect();
 
         // load record from DB
         $db = new Database();
 
-        $dbObject = $db->select(self::$__sqlSelect);
+        $dbObject = $db->select(self::__getQuerySelect());
         //$this->populateFromDB($dbObject);
         foreach ($dbObject as &$record){
             $newObject = new self::$allowedType();
             $this->add($newObject->populateFromDB($record));
         }
 
+        $db = null;
+    }
+
+    public function __loadWithWhere(string $whereQuery, ?array $params = null): void
+    {
+        self::__checkSqlSelect();
+
+        $queryToLoad = self::__getQuerySelect() . " WHERE " . $whereQuery;
+
+        // load record from DB
+        $db = new Database();
+
+        if (isset($params)){
+            $dbObject = $db->select($queryToLoad, $params);
+        }
+        else{
+            $dbObject = $db->select($queryToLoad);
+        }
+
+        foreach ($dbObject as &$record){
+            $newObject = new self::$allowedType();
+            $this->add($newObject->populateFromDB($record));
+        }
+
+        $db = null;
+    }
+
+    public function __saveAll(): void
+    {
+        $db = new Database();
+
+        foreach ($this as &$item) {
+            if (is_subclass_of($item::class, __EntityDB::class)){
+                $item->__SavePrivate($db);
+            }
+        }
+        
         $db = null;
     }
 }
