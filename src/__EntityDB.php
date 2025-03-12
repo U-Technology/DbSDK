@@ -2,8 +2,15 @@
 
 namespace UTechnology\DbSDK;
 
+use Exception;
+use FieldName;
+use IsAutoIncrement;
+use IsPrimaryKeyField;
+use ReflectionClass;
+use ReflectionException;
 use src\ParameterQuery;
-use UTechnology\DbSDK\DAL\MySQL\Database;
+use TableName;
+use UTechnology\DbSDK\DAL\IDatabase;
 use UTechnology\DbSDK\DAL\Utility;
 
 abstract class __EntityDB
@@ -30,6 +37,10 @@ abstract class __EntityDB
     protected static array $__primaryKeyFields = [];
 
     protected static array $__selectWithoutWhereQueries = [];
+
+    /**
+     * @throws Exception
+     */
     public static function __getSelectWithoutWhereQuery() :string{
         self::createQuerySelect();
         return self::$__selectWithoutWhereQueries[static::class];
@@ -45,6 +56,9 @@ abstract class __EntityDB
 
     static string $__attributeNameForTable = 'TableName';
 
+    /**
+     * @throws Exception
+     */
     public function __construct($primaryKey = null)
     {
         $this->initializeAttributeMap();
@@ -59,10 +73,14 @@ abstract class __EntityDB
 
         // load object
         if (isset($primaryKey)) {
-            $this->__Load();
+            $this->__Load($primaryKey);
+
         }
     }
 
+    /**
+     * @throws Exception
+     */
     private function createSelectCommand($primaryKey): void
     {
         if (!isset(self::$__primaryKeyFields[static::class])) {
@@ -77,7 +95,7 @@ abstract class __EntityDB
             // create query for class
             self::createQuerySelect();
             $querySelect = self::$__selectWithoutWhereQueries[static::class];
-            $querySelect = $querySelect . ' WHERE ' . self::$__primaryKeyFields[static::class] . ' = :' . self::$__primaryKeyFields[static::class];
+            self::$__selectQueries[static::class] = $querySelect . ' WHERE ' . self::$__primaryKeyFields[static::class] . ' = :' . self::$__primaryKeyFields[static::class];
 
             $parameter = new ParameterQuery();
             $parameter->Name = self::$__primaryKeyFields[static::class];
@@ -88,6 +106,9 @@ abstract class __EntityDB
         }
     }
 
+    /**
+     * @throws Exception
+     */
     private static function createQuerySelect(): void
     {
         if (!isset(self::$__selectWithoutWhereQueries[static::class])){
@@ -95,6 +116,9 @@ abstract class __EntityDB
         }
     }
 
+    /**
+     * @throws Exception
+     */
     private function CreateInsertCommand(): void
     {
         if(isset(self::$__insertQueries[static::class])){
@@ -133,22 +157,16 @@ abstract class __EntityDB
 
         self::$__paramsInsert[static::class] = $paramsCollection;
 
-        $queryLastID = '';
         $this->__getLastID = false;
         if (self::getAutoIncrementFields() != '') {
-//            $queryLastID = ';
-//    SELECT LAST_INSERT_ID() AS ID';
             $this->__getLastID = true;
         }
-
-//        self::$__insertQueries[static::class] = 'INSERT INTO ' . self::$attributeClass[static::class][self::$__attributeNameForTable] . '
-//        (' . $queryField . ')
-//    VALUES
-//        (' . $queryParam . ')
-//    ' . $queryLastID;
         self::$__insertQueries[static::class] = Utility::createSqlInsert(self::$attributeClass[static::class][self::$__attributeNameForTable] , $queryField, $queryParam, $this->__getLastID, self::getAutoIncrementFields());
     }
 
+    /**
+     * @throws Exception
+     */
     private function createUpdateCommand(): void
     {
         if(isset(self::$__updateQueries[static::class])){
@@ -182,13 +200,11 @@ abstract class __EntityDB
                 $param->Name = $key;
                 $param->setParameterType(self::getPropertyType()[$key]);
                 // add parameter to array
-                $paramsCollection = $param;
+                $paramsCollection[] = $param;
             }
         }
 
-        self::$__updateQueries[static::class] = 'UPDATE ' . self::$attributeClass[self::$__attributeNameForTable] . ' SET
-    ' . $queryField . '
-WHERE ' . self::getPrimaryKey() . ' = :' . self::getPrimaryKey();
+        self::$__updateQueries[static::class] = Utility::createSqlUpdate(self::$attributeClass[self::$__attributeNameForTable], $queryField, self::getPrimaryKey());
 
 
         // create parameters array
@@ -202,6 +218,9 @@ WHERE ' . self::getPrimaryKey() . ' = :' . self::getPrimaryKey();
 
     }
 
+    /**
+     * @throws Exception
+     */
     private function createDeleteCommand(): void
     {
         if (isset(self::$__deleteQueries[static::class])){
@@ -216,7 +235,7 @@ WHERE ' . self::getPrimaryKey() . ' = :' . self::getPrimaryKey();
             return;
         }
 
-        self::$__deleteQueries[static::class] = 'DELETE FROM ' . self::$attributeClass[self::$__attributeNameForTable] . ' WHERE ' . self::getPrimaryKey() . ' = :' . self::getPrimaryKey();
+        self::$__deleteQueries[static::class] = Utility::createSqlDelete(self::$attributeClass[self::$__attributeNameForTable], self::getPrimaryKey());
 
         // create parameters array
         $param = new ParameterQuery();
@@ -234,12 +253,12 @@ WHERE ' . self::getPrimaryKey() . ' = :' . self::getPrimaryKey();
             }
         }
 
-        $reflection = new \ReflectionClass($this);
+        $reflection = new ReflectionClass($this);
 
         // class attribute
         foreach ($reflection->getAttributes() as $attribute) {
             $instance = $attribute->newInstance();
-            if ($instance instanceof \TableName) {
+            if ($instance instanceof TableName) {
                 self::$attributeClass[static::class] = [self::$__attributeNameForTable => $instance->GetTableName()];
             }
         }
@@ -251,13 +270,13 @@ WHERE ' . self::getPrimaryKey() . ' = :' . self::getPrimaryKey();
         foreach ($reflection->getProperties() as $property) {
             foreach ($property->getAttributes() as $attribute) {
                 $instance = $attribute->newInstance();
-                if ($instance instanceof \FieldName) {
+                if ($instance instanceof FieldName) {
                     $attribute[$instance->GetFieldName()] = $property->getName();
                     $types[$instance->GetFieldName()] = $property->getType();
-                } else if ($instance instanceof \IsAutoIncrement) {
+                } else if ($instance instanceof IsAutoIncrement) {
                     //  da sistemare ancora come array
                     self::$__autoIncrementsFields[static::class] = $property->getName();
-                } else if ($instance instanceof \IsPrimaryKeyField) {
+                } else if ($instance instanceof IsPrimaryKeyField) {
                     self::$__primaryKeyFields[static::class] = $property->getName();
                 }
             }
@@ -341,10 +360,14 @@ WHERE ' . self::getPrimaryKey() . ' = :' . self::getPrimaryKey();
 
     /* CRUD operation*/
 
-    private function __SavePrivate($db): void
+    /**
+     * @throws ReflectionException
+     * @throws Exception
+     */
+    private function __SavePrivate(IDatabase $db): void
     {
         // setting parameters DB with properties values of object
-        $reflection = new \ReflectionClass($this);
+        $reflection = new ReflectionClass($this);
 
         if ($this->__isNewRecord) {
             // is new record, execute insert statement
@@ -354,19 +377,16 @@ WHERE ' . self::getPrimaryKey() . ' = :' . self::getPrimaryKey();
                 $param->Value = $property->getValue($this);
             }
 
-            //$db = new Database();
-
             if (!$this->__getLastID) {
                 // no autoincrement field
-                $db->Execute($this->__getInsertCommand(), self::getParamInsert());
+                //$db->Execute($this->__getInsertCommand(), self::getParamInsert());
+                $db->Save($this->__getInsertCommand(), self::getParamInsert());
             } else {
                 // with autoincrement field
                 $lastValue = $db->selectFirst(self::__getInsertCommand(), self::getParamInsert());
                 $propertyID = $reflection->getProperty(self::getAutoIncrementFields());
                 $propertyID->setValue($this, $lastValue);
             }
-
-            //$db = null;
         } else {
             // is an existing record, execute update statement
             foreach (self::getParamUpdate() as $param) {
@@ -375,20 +395,17 @@ WHERE ' . self::getPrimaryKey() . ' = :' . self::getPrimaryKey();
                 $param->Value = $property->getValue($this);
             }
 
-            //$db = new Database();
+            $db->Save($this->__getUpdateCommand(), self::getParamUpdate());
 
-            $db->Execute($this->__getUpdateCommand(), self::getParamUpdate());
-
-            //$db = null;
         }
 
     }
 
     /**Save the object into DB
-     * @return void
+     * @throws ReflectionException
      */
-    public function __Save(): void{
-        $db = new Database();
+    protected function __Save(): void{
+        $db = ConfigConnection::CreateDBInstance();
         $this->__SavePrivate($db);
         $db = null;
     }
@@ -396,12 +413,11 @@ WHERE ' . self::getPrimaryKey() . ' = :' . self::getPrimaryKey();
     /**Load single record from DB
      * @param mixed $idPrimaryKey
      * @return void
-     * @throws \Exception
      */
-    private function __Load(mixed $idPrimaryKey): void
+    protected function __Load(mixed $idPrimaryKey): void
     {
         if ($idPrimaryKey instanceof self::getPropertyType()[self::getPrimaryKey()]) {
-            $db = new Database();
+            $db = ConfigConnection::CreateDBInstance();
 
             self::getParamSelect()->Value = $idPrimaryKey;
 

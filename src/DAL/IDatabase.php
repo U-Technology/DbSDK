@@ -2,6 +2,8 @@
 
 namespace UTechnology\DbSDK\DAL;
 
+use Exception;
+
 interface IDatabase
 {
     /**Execute select statement for query in input and returns first record founded
@@ -25,7 +27,18 @@ interface IDatabase
      */
     public function Execute(string $query = "", array $params = []): bool;
 
+    /**Execute statement to save modified data
+     * @param string $query Query to execute
+     * @param array $params Params used in query
+     * @return bool If query is execute correctly, return True
+     * @throws Exception
+     */
     public function Save(string $query = "", array $params = []) :bool;
 
+    /**Execute statement to delete data
+     * @param string $query Query to execute
+     * @param array $params Params used in query
+     * @return bool If query is execute correctly, return True
+     */
     public function Delete(string $query = "", array $params = []) :bool;
 }
