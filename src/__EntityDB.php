@@ -4,6 +4,7 @@ namespace UTechnology\DbSDK;
 
 use src\ParameterQuery;
 use UTechnology\DbSDK\DAL\MySQL\Database;
+use UTechnology\DbSDK\DAL\Utility;
 
 abstract class __EntityDB
 {
@@ -90,7 +91,7 @@ abstract class __EntityDB
     private static function createQuerySelect(): void
     {
         if (!isset(self::$__selectWithoutWhereQueries[static::class])){
-            self::$__selectWithoutWhereQueries[static::class] = 'SELECT * FROM ' . self::$attributeClass[self::$__attributeNameForTable];
+            self::$__selectWithoutWhereQueries[static::class] = Utility::createSqlSelect(self::$attributeClass[self::$__attributeNameForTable]);
         }
     }
 
@@ -135,16 +136,17 @@ abstract class __EntityDB
         $queryLastID = '';
         $this->__getLastID = false;
         if (self::getAutoIncrementFields() != '') {
-            $queryLastID = ';
-    SELECT LAST_INSERT_ID() AS ID';
+//            $queryLastID = ';
+//    SELECT LAST_INSERT_ID() AS ID';
             $this->__getLastID = true;
         }
 
-        self::$__insertQueries[static::class] = 'INSERT INTO ' . self::$attributeClass[static::class][self::$__attributeNameForTable] . '
-        (' . $queryField . ')
-    VALUES
-        (' . $queryParam . ')
-    ' . $queryLastID;
+//        self::$__insertQueries[static::class] = 'INSERT INTO ' . self::$attributeClass[static::class][self::$__attributeNameForTable] . '
+//        (' . $queryField . ')
+//    VALUES
+//        (' . $queryParam . ')
+//    ' . $queryLastID;
+        self::$__insertQueries[static::class] = Utility::createSqlInsert(self::$attributeClass[static::class][self::$__attributeNameForTable] , $queryField, $queryParam, $this->__getLastID, self::getAutoIncrementFields());
     }
 
     private function createUpdateCommand(): void
