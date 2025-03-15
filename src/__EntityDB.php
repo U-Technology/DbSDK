@@ -335,6 +335,10 @@ abstract class __EntityDB
         return self::$__selectQueries[static::class];
     }
 
+    /**Populate object with DB data
+     * @param array $data
+     * @return void
+     */
     public function populateFromDB(array $data): void
     {
         foreach ($data as $field => $value) {
