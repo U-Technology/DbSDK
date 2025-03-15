@@ -316,7 +316,7 @@ WHERE ' . self::getPrimaryKey() . ' = :' . self::getPrimaryKey();
         return self::$__selectQueries[static::class];
     }
 
-    private function populateFromDB(array $data): void
+    public function populateFromDB(array $data): void
     {
         foreach ($data as $field => $value) {
             if (isset(self::getAttribute()[$field])) {
