@@ -9,13 +9,17 @@ use src\Config\ParameterDBMySQL;
 use src\Enum\ParamTypeQuery;
 use UTechnology\DbSDK\DAL\IDatabase;
 
-class Database implements IDatabase
+class MySql_Database implements IDatabase
 {
     private PDO $pdo;
+    private static string $__connectionString = '';
 
     public function __construct(){
         try {
-            $this->pdo = new PDO("mysql:host=" . ParameterDBMySQL::getHost() . ";dbname=" . ParameterDBMySQL::getDbName(), ParameterDBMySQL::getUsername(), ParameterDBMySQL::getPassword());
+            if (self::$__connectionString == ''){
+                self::$__connectionString = "mysql:host=" . ParameterDBMySQL::getHost() . ";dbname=" . ParameterDBMySQL::getDbName();
+            }
+            $this->pdo = new PDO(self::$__connectionString, ParameterDBMySQL::getUsername(), ParameterDBMySQL::getPassword());
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             throw new Exception("Could not connect to database. " . $e->getMessage());
@@ -74,7 +78,7 @@ class Database implements IDatabase
     {
         try {
             $sth = $this->pdo->prepare($query);
-            foreach ($params as &$itemPar) {
+            foreach ($params as $itemPar) {
                 $sth->bindParam(":" . $itemPar->Name, $itemPar->Value, $this->GetParamType($itemPar->ParamType));
             }
 
@@ -86,9 +90,7 @@ class Database implements IDatabase
 
 
             if ($returnValue){
-                $resultQuery = $sth->fetchAll();
-
-                return $resultQuery;
+                return $sth->fetchAll();
             }
             else {
                 return true;
@@ -105,5 +107,35 @@ class Database implements IDatabase
             default => PDO::PARAM_STR,
         };
 
+    }
+
+    /**Execute statement to save modified data
+     * @param string $query Query to execute
+     * @param array $params Params used in query
+     * @return bool If query is execute correctly, return True
+     * @throws Exception
+     */
+    public function Save(string $query = "", array $params = []): bool
+    {
+        try{
+            return $this->executeStatement($query, $params, false);
+        }catch(Exception $e) {
+            throw New Exception( $e->getMessage() );
+        }
+    }
+
+    /**Execute statement to delete data
+     * @param string $query Query to execute
+     * @param array $params Params used in query
+     * @return bool If query is execute correctly, return True
+     * @throws Exception
+     */
+    public function Delete(string $query = "", array $params = []): bool
+    {
+        try{
+            return $this->executeStatement($query, $params, false);
+        }catch(Exception $e) {
+            throw New Exception( $e->getMessage() );
+        }
     }
 }

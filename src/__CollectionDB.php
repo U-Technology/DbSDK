@@ -3,13 +3,18 @@
 namespace UTechnology\DbSDK;
 
 use ArrayObject;
+use Exception;
 use InvalidArgumentException;
-use UTechnology\DbSDK\DAL\MySQL\Database;
+use UTechnology\DbSDK\DAL\Utility;
 
 abstract class __CollectionDB extends ArrayObject
 {
     protected string $allowedType;
 
+    /**Create new collection of data defined to $allowedType
+     * @param string $allowedType
+     * @param array $items
+     */
     public function __construct(string $allowedType, array $items = [])
     {
         $this->allowedType = $allowedType;
@@ -42,12 +47,19 @@ abstract class __CollectionDB extends ArrayObject
         }
     }
 
+    /**Add new item in collection
+     * @param object $item
+     * @return void
+     */
     public function add(object $item): void
     {
         $this->validateType($item);
         $this->append($item);
     }
 
+    /**Get type of collection object
+     * @return string
+     */
     public function getType(): string
     {
         return $this->allowedType;
@@ -72,12 +84,16 @@ abstract class __CollectionDB extends ArrayObject
         self::$__selectQueries[static::class] = self::$allowedType::__getQuerySelectWithoutWhere();
     }
 
-    public function __loadAll(): void
+
+    /**Load all object from DB
+     * @return void
+     */
+    protected function __loadAll(): void
     {
         self::__checkSqlSelect();
 
         // load record from DB
-        $db = new Database();
+        $db = ConfigConnection::CreateDBInstance();
 
         $dbObject = $db->select(self::__getQuerySelect());
         //$this->populateFromDB($dbObject);
@@ -89,14 +105,21 @@ abstract class __CollectionDB extends ArrayObject
         $db = null;
     }
 
-    public function __loadWithWhere(string $whereQuery, ?array $params = null): void
+
+    /**Load objects from DB with where statement in $whereQuery
+     * @param string $whereQuery
+     * @param array|null $params
+     * @return void
+     * @throws Exception
+     */
+    protected function __loadWithWhere(string $whereQuery, ?array $params = null): void
     {
         self::__checkSqlSelect();
 
-        $queryToLoad = self::__getQuerySelect() . " WHERE " . $whereQuery;
+        $queryToLoad = Utility::addWhereInQuery(self::__getQuerySelect(), $whereQuery);
 
         // load record from DB
-        $db = new Database();
+        $db = ConfigConnection::CreateDBInstance();
 
         if (isset($params)){
             $dbObject = $db->select($queryToLoad, $params);
@@ -113,9 +136,13 @@ abstract class __CollectionDB extends ArrayObject
         $db = null;
     }
 
-    public function __saveAll(): void
+
+    /**Save collection object in DB
+     * @return void
+     */
+    protected function __saveAll(): void
     {
-        $db = new Database();
+        $db = ConfigConnection::CreateDBInstance();
 
         foreach ($this as &$item) {
             if (is_subclass_of($item::class, __EntityDB::class)){

@@ -44,4 +44,37 @@ class Utility
 
         return '';
     }
+
+    public static function createSqlUpdate(string $tableName, string $fieldsAndParametersList, string $primaryKeyNameField) : string{
+        switch (ConfigConnection::getConnectionType()){
+            case ConnectionType::MySQL:
+                return 'UPDATE ' . $tableName . ' SET
+        ' . $fieldsAndParametersList . '
+    WHERE ' . $primaryKeyNameField . ' = :' . $primaryKeyNameField;
+            case ConnectionType::PostgreSQL:
+                throw new \Exception('To be implemented');
+        }
+        return '';
+    }
+
+    public static function createSqlDelete(string $tableName, string $primaryKeyField) :string{
+        switch (ConfigConnection::getConnectionType()){
+            case ConnectionType::MySQL:
+                return 'DELETE FROM ' . $tableName . ' WHERE ' . $primaryKeyField . ' = :' . $primaryKeyField;
+            case ConnectionType::PostgreSQL:
+                throw new \Exception('To be implemented');
+        }
+        return '';
+    }
+
+    public static function addWhereInQuery(string $query, string $conditionWithoutWhere): string
+    {
+        switch (ConfigConnection::getConnectionType()){
+            case ConnectionType::MySQL:
+                return $query . ' WHERE ' . $conditionWithoutWhere;
+            case ConnectionType::PostgreSQL:
+                throw new \Exception('To be implemented');
+        }
+        return '';
+    }
 }
