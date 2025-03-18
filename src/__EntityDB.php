@@ -55,7 +55,7 @@ abstract class __EntityDB
         $this->__isNewRecord = $_isNewRecord;
     }
 
-    // static string $__attributeNameForTable = 'TableName';
+    static string $__attributeNameForTable = 'TableName';
 
     /**
      * @throws Exception
@@ -266,7 +266,7 @@ abstract class __EntityDB
         // for first time, can't use the class attribute, because not work correctly
         // we can use a string const for defined the table name
         if ($reflection->getProperty('__tableName')) {
-            self::$attributeClass[static::class] =  $reflection->getProperty('__tableName')->getValue($this);
+            self::$attributeClass[static::class] =  [self::$__attributeNameForTable => $reflection->getProperty('__tableName')->getValue($this)];
         }
 
 
