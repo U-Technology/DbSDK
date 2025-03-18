@@ -2,7 +2,7 @@
 
 namespace UTechnology\DbSDK;
 
-use src\Enum\ParamTypeQuery;
+use UTechnology\DbSDK\Enum\ParamTypeQuery;
 
 class ParameterQuery
 {

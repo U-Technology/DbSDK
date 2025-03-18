@@ -14,6 +14,10 @@ use UTechnology\DbSDK\DAL\Utility;
 
 abstract class __EntityDB
 {
+    abstract string $__tableName {
+        get;
+        set;
+    }
     protected static array $__attributesMap = [];
     protected static array $__propertiesType = [];
     static array $attributeClass = [];
@@ -53,7 +57,7 @@ abstract class __EntityDB
         $this->__isNewRecord = $_isNewRecord;
     }
 
-    static string $__attributeNameForTable = 'TableName';
+    // static string $__attributeNameForTable = 'TableName';
 
     /**
      * @throws Exception
@@ -255,12 +259,18 @@ abstract class __EntityDB
         $reflection = new ReflectionClass($this);
 
         // class attribute
-        foreach ($reflection->getAttributes() as $attribute) {
-            $instance = $attribute->newInstance();
-            if ($instance instanceof TableName) {
-                self::$attributeClass[static::class] = [self::$__attributeNameForTable => $instance->GetTableName()];
-            }
+//        foreach ($reflection->getAttributes() as $attribute) {
+//            $instance = $attribute->newInstance();
+//            if ($instance instanceof TableName) {
+//                self::$attributeClass[static::class] = [self::$__attributeNameForTable => $instance->GetTableName()];
+//            }
+//        }
+        // for first time, can't use the class attribute, because not work correctly
+        // we can use a string const for defined the table name
+        if ($reflection->getProperty('__tableName')) {
+            self::$attributeClass[static::class] =  $reflection->getProperty('__tableName')->getValue($this);
         }
+
 
         $attributes = [];
         $types = [];

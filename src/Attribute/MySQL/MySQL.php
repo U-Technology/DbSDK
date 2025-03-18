@@ -4,19 +4,20 @@ namespace UTechnology\DbSDK\Attribute\MySQL;;
 
 use Attribute;
 
-#[Attribute(Attribute::TARGET_CLASS)]
-class TableName{
-    private string $tableName;
-
-    public function __construct($tableName = null)
-    {
-        $this->tableName = $tableName;
-    }
-
-    public function GetTableName() : string{
-        return $this->tableName;
-    }
-}
+// TODO
+//#[Attribute(Attribute::TARGET_CLASS)]
+//class TableName{
+//    private string $tableName;
+//
+//    public function __construct($tableName = null)
+//    {
+//        $this->tableName = $tableName;
+//    }
+//
+//    public function GetTableName() : string{
+//        return $this->tableName;
+//    }
+//}
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class FieldName{
