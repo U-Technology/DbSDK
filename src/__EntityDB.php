@@ -8,15 +8,13 @@ use ReflectionException;
 use UTechnology\DbSDK\Attribute\MySQL\FieldName;
 use UTechnology\DbSDK\Attribute\MySQL\IsAutoIncrement;
 use UTechnology\DbSDK\Attribute\MySQL\IsPrimaryKeyField;
-use UTechnology\DbSDK\Attribute\MySQL\TableName;
 use UTechnology\DbSDK\DAL\IDatabase;
 use UTechnology\DbSDK\DAL\Utility;
 
 abstract class __EntityDB
 {
-    abstract string $__tableName {
+    protected abstract string $__tableName {
         get;
-        set;
     }
     protected static array $__attributesMap = [];
     protected static array $__propertiesType = [];
