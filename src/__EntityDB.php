@@ -279,7 +279,7 @@ abstract class __EntityDB
                 //$instance = $attribute->newInstance();
                 if ($attribute->name === FieldName::class) {
                     $fieldName = $attribute->getArguments()[0];
-                    $attribute[$fieldName] = $property->getName();
+                    $attributes[$fieldName] = $property->getName();
                     $types[$fieldName] = $property->getType();
                 } else if ($attribute->name === IsAutoIncrement::class) {
                     //  da sistemare ancora come array
