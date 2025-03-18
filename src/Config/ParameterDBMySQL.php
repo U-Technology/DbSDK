@@ -1,7 +1,6 @@
 <?php
 
-namespace src\Config;
-
+namespace UTechnology\DbSDK\Config;
 class ParameterDBMySQL
 {
     private static string $host = "";

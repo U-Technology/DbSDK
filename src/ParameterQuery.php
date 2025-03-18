@@ -1,6 +1,6 @@
 <?php
 
-namespace src;
+namespace UTechnology\DbSDK;
 
 use src\Enum\ParamTypeQuery;
 

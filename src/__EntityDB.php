@@ -3,13 +3,12 @@
 namespace UTechnology\DbSDK;
 
 use Exception;
-use FieldName;
-use IsAutoIncrement;
-use IsPrimaryKeyField;
 use ReflectionClass;
 use ReflectionException;
-use src\ParameterQuery;
-use TableName;
+use UTechnology\DbSDK\Attribute\MySQL\FieldName;
+use UTechnology\DbSDK\Attribute\MySQL\IsAutoIncrement;
+use UTechnology\DbSDK\Attribute\MySQL\IsPrimaryKeyField;
+use UTechnology\DbSDK\Attribute\MySQL\TableName;
 use UTechnology\DbSDK\DAL\IDatabase;
 use UTechnology\DbSDK\DAL\Utility;
 
@@ -420,7 +419,7 @@ abstract class __EntityDB
      */
     protected function __Load(mixed $idPrimaryKey): void
     {
-        if ($idPrimaryKey instanceof self::getPropertyType()[self::getPrimaryKey()]) {
+        if ($idPrimaryKey instanceof (self::getPropertyType()[self::getPrimaryKey()])) {
             $db = ConfigConnection::CreateDBInstance();
 
             self::getParamSelect()->Value = $idPrimaryKey;

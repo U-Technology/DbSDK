@@ -2,7 +2,7 @@
 
 namespace UTechnology\DbSDK;
 
-use src\Config\ParameterDBMySQL;
+use UTechnology\DbSDK\Config\ParameterDBMySQL;
 use UTechnology\DbSDK\Config\ParameterDBPostgreSQL;
 use UTechnology\DbSDK\DAL\IDatabase;
 use UTechnology\DbSDK\DAL\MySQL\MySql_Database;

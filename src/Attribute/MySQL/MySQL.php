@@ -1,4 +1,9 @@
 <?php
+
+namespace UTechnology\DbSDK\Attribute\MySQL;;
+
+use Attribute;
+
 #[Attribute(Attribute::TARGET_CLASS)]
 class TableName{
     private string $tableName;
