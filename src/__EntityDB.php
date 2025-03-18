@@ -276,14 +276,15 @@ abstract class __EntityDB
         // property attribute
         foreach ($reflection->getProperties() as $property) {
             foreach ($property->getAttributes() as $attribute) {
-                $instance = $attribute->newInstance();
-                if ($instance instanceof FieldName) {
-                    $attribute[$instance->GetFieldName()] = $property->getName();
-                    $types[$instance->GetFieldName()] = $property->getType();
-                } else if ($instance instanceof IsAutoIncrement) {
+                //$instance = $attribute->newInstance();
+                if ($attribute->name === FieldName::class) {
+                    $fieldName = $attribute->getArguments()[0];
+                    $attribute[$fieldName] = $property->getName();
+                    $types[$fieldName] = $property->getType();
+                } else if ($attribute->name === IsAutoIncrement::class) {
                     //  da sistemare ancora come array
                     self::$__autoIncrementsFields[static::class] = $property->getName();
-                } else if ($instance instanceof IsPrimaryKeyField) {
+                } else if ($attribute->name === IsPrimaryKeyField::class) {
                     self::$__primaryKeyFields[static::class] = $property->getName();
                 }
             }
