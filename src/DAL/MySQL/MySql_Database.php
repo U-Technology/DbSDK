@@ -5,9 +5,9 @@ namespace UTechnology\DbSDK\DAL\MySQL;
 use Exception;
 use PDO;
 use PDOException;
-use src\Config\ParameterDBMySQL;
-use src\Enum\ParamTypeQuery;
+use UTechnology\DbSDK\Config\ParameterDBMySQL;
 use UTechnology\DbSDK\DAL\IDatabase;
+use UTechnology\DbSDK\Enum\ParamTypeQuery;
 
 class MySql_Database implements IDatabase
 {
