@@ -152,7 +152,7 @@ abstract class __EntityDB
                 $param = new ParameterQuery();
                 $param->Name = $key;
                 $param->setParameterType(self::getPropertyType()[$key]);
-                $paramsCollection = $param;
+                $paramsCollection[$key] = $param;
             }
         }
 
@@ -201,7 +201,7 @@ abstract class __EntityDB
                 $param->Name = $key;
                 $param->setParameterType(self::getPropertyType()[$key]);
                 // add parameter to array
-                $paramsCollection[] = $param;
+                $paramsCollection[$key] = $param;
             }
         }
 
@@ -243,7 +243,7 @@ abstract class __EntityDB
         $param->Name = self::getPrimaryKey();
         $param->setParameterType(self::getPropertyType()[self::getPrimaryKey()]);
         // add parameter to array
-        self::$__paramsDelete[] = $param;
+        self::$__paramsDelete[self::getPrimaryKey()] = $param;
     }
 
     private function initializeAttributeMap(): void
