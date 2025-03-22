@@ -26,16 +26,10 @@ class Utility
     public static function createSqlInsert(string $tableName, string $fieldsList, string $parametersList, bool $getLastId, string $idFieldName = '') :string{
         switch (ConfigConnection::getConnectionType()){
             case ConnectionType::MySQL:
-                $queryLastID = '';
-                if ($getLastId && $idFieldName != ''){
-                    $queryLastID = ';
-    SELECT LAST_INSERT_ID() AS ID';
-                }
                 $query = 'INSERT INTO ' . $tableName . '
         (' . $fieldsList . ')
     VALUES
-        (' . $parametersList . ')
-    ' . $queryLastID;
+        (' . $parametersList . ')';
 
                 return $query;
             case ConnectionType::PostgreSQL:

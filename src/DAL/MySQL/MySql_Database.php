@@ -74,7 +74,7 @@ class MySql_Database implements IDatabase
         }
     }
 
-    private function executeStatement($query = "" , $params = [], $returnValue = true)
+    private function executeStatement($query = "" , $params = [], $returnValue = true, $getLastID = false)
     {
         try {
             $sth = $this->pdo->prepare($query);
@@ -90,7 +90,12 @@ class MySql_Database implements IDatabase
 
 
             if ($returnValue){
-                return $sth->fetchAll();
+                if (!$getLastID) {
+                    return $sth->fetchAll();
+                }
+                else{
+                    return $this->pdo->lastInsertId();
+                }
             }
             else {
                 return true;
@@ -115,10 +120,14 @@ class MySql_Database implements IDatabase
      * @return bool If query is execute correctly, return True
      * @throws Exception
      */
-    public function Save(string $query = "", array $params = []): bool
+    public function Save(string $query = "", array $params = [], bool $getLastID = false): bool
     {
         try{
-            return $this->executeStatement($query, $params, false);
+            $returnValue = false;
+            if($getLastID){
+                $returnValue = true;
+            }
+            return $this->executeStatement($query, $params, $returnValue,  $getLastID);
         }catch(Exception $e) {
             throw New Exception( $e->getMessage() );
         }
