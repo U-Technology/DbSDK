@@ -350,9 +350,11 @@ abstract class __EntityDB
     public function populateFromDB(array $data): void
     {
         foreach ($data as $field => $value) {
-            if (isset(self::getAttribute()[$field])) {
-                $propertyName = self::getAttribute()[$field];
-                $this->$propertyName = $value;
+            if (isset($value)) {
+                if (isset(self::getAttribute()[$field])) {
+                    $propertyName = self::getAttribute()[$field];
+                    $this->$propertyName = $value;
+                }
             }
         }
     }
