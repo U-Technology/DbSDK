@@ -386,7 +386,13 @@ abstract class __EntityDB
             foreach (self::getParamInsert() as $param) {
                 $propertyName = self::getAttribute()[$param->Name];
                 $property = $reflection->getProperty($propertyName);
-                $param->Value = $property->getValue($this);
+                //$param->Value = $property->getValue($this);
+                if ($property->isInitialized($this)){
+                    $param->Value = $property->getValue($this);
+                }
+                else{
+                    $param->Value = null;
+                }
             }
 
             if (!$this->__getLastID) {
@@ -404,7 +410,13 @@ abstract class __EntityDB
             foreach (self::getParamUpdate() as $param) {
                 $propertyName = self::getAttribute()[$param->Name];
                 $property = $reflection->getProperty($propertyName);
-                $param->Value = $property->getValue($this);
+                //$param->Value = $property->getValue($this);
+                if ($property->isInitialized($this)){
+                    $param->Value = $property->getValue($this);
+                }
+                else{
+                    $param->Value = null;
+                }
             }
 
             $db->Save($this->__getUpdateCommand(), self::getParamUpdate());
