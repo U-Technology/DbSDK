@@ -401,7 +401,7 @@ abstract class __EntityDB
                 $db->Save($this->__getInsertCommand(), self::getParamInsert());
             } else {
                 // with autoincrement field
-                $lastValue = $db->selectFirst(self::__getInsertCommand(), self::getParamInsert());
+                $lastValue = (int)$db->Save(self::__getInsertCommand(), self::getParamInsert(), true);
                 $propertyID = $reflection->getProperty(self::getAutoIncrementFields());
                 $propertyID->setValue($this, $lastValue);
             }

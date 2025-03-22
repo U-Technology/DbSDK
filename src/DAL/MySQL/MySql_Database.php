@@ -74,7 +74,7 @@ class MySql_Database implements IDatabase
         }
     }
 
-    private function executeStatement($query = "" , $params = [], $returnValue = true, $getLastID = false)
+    private function executeStatement($query = "" , $params = [], $returnValue = true, $getLastID = false): bool|array|string
     {
         try {
             $sth = $this->pdo->prepare($query);
@@ -120,7 +120,7 @@ class MySql_Database implements IDatabase
      * @return bool If query is execute correctly, return True
      * @throws Exception
      */
-    public function Save(string $query = "", array $params = [], bool $getLastID = false): bool
+    public function Save(string $query = "", array $params = [], bool $getLastID = false): bool|string
     {
         try{
             $returnValue = false;

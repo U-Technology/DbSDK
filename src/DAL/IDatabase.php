@@ -33,7 +33,7 @@ interface IDatabase
      * @return bool If query is execute correctly, return True
      * @throws Exception
      */
-    public function Save(string $query = "", array $params = [], bool $getLastID = false) :bool;
+    public function Save(string $query = "", array $params = [], bool $getLastID = false) :bool|string;
 
     /**Execute statement to delete data
      * @param string $query Query to execute
