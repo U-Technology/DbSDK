@@ -452,6 +452,29 @@ abstract class __EntityDB
 
             $db = null;
         }
+    }
+
+    /**Select single object with where clause
+     * @param string $where Where clause to use for loading data
+     * @param array|null $params Params in where. If query is directly with value, this array can set NULL
+     * @return void
+     * @throws Exception
+     */
+    protected function __LoadWithWhere(string $where, ?array $params = null): void{
+        if ($where != "") {
+            $query = Utility::addWhereInQuery(self::__getSelectWithoutWhereQuery(), $where);
+
+            $db = ConfigConnection::CreateDBInstance();
+            if (isset($params)) {
+                $dbObject = $db->selectFirst($query, [$params]);
+            }
+            else {
+                $dbObject = $db->selectFirst($query);
+            }
+            $this->populateFromDB($dbObject);
+
+            $db = null;
+        }
 
     }
 }
