@@ -88,7 +88,7 @@ abstract class __EntityDB
             return;
         }
 
-        if (self::$attributeClass[self::$__attributeNameForTable] === '') {
+        if (self::$attributeClass[static::class][self::$__attributeNameForTable] === '') {
             return;
         }
 
@@ -113,7 +113,7 @@ abstract class __EntityDB
     private static function createQuerySelect(): void
     {
         if (!isset(self::$__selectWithoutWhereQueries[static::class])){
-            self::$__selectWithoutWhereQueries[static::class] = Utility::createSqlSelect(self::$attributeClass[self::$__attributeNameForTable]);
+            self::$__selectWithoutWhereQueries[static::class] = Utility::createSqlSelect(self::$attributeClass[static::class][self::$__attributeNameForTable]);
         }
     }
 
@@ -205,7 +205,7 @@ abstract class __EntityDB
             }
         }
 
-        self::$__updateQueries[static::class] = Utility::createSqlUpdate(self::$attributeClass[self::$__attributeNameForTable], $queryField, self::getPrimaryKey());
+        self::$__updateQueries[static::class] = Utility::createSqlUpdate(self::$attributeClass[static::class][self::$__attributeNameForTable], $queryField, self::getPrimaryKey());
 
 
         // create parameters array
@@ -236,7 +236,7 @@ abstract class __EntityDB
             return;
         }
 
-        self::$__deleteQueries[static::class] = Utility::createSqlDelete(self::$attributeClass[self::$__attributeNameForTable], self::getPrimaryKey());
+        self::$__deleteQueries[static::class] = Utility::createSqlDelete(self::$attributeClass[static::class][self::$__attributeNameForTable], self::getPrimaryKey());
 
         // create parameters array
         $param = new ParameterQuery();
