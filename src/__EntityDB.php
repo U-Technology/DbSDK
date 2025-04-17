@@ -466,7 +466,7 @@ abstract class __EntityDB
 
             $db = ConfigConnection::CreateDBInstance();
             if (isset($params)) {
-                $dbObject = $db->selectFirst($query, [$params]);
+                $dbObject = $db->selectFirst($query, $params);
             }
             else {
                 $dbObject = $db->selectFirst($query);

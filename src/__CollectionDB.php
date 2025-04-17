@@ -77,11 +77,13 @@ abstract class __CollectionDB extends ArrayObject
 
     protected static function __checkSqlSelect(): void
     {
-        if (self::$allowedType::__getQuerySelectWithoutWhere() === ''){
-            self::$__selectQueries[static::class] = (new self::$allowedType())::__getQuerySelectWithoutWhere();
-            return;
-        }
-        self::$__selectQueries[static::class] = self::$allowedType::__getQuerySelectWithoutWhere();
+//        if (self::$allowedType::__getQuerySelectWithoutWhere() === ''){
+//            self::$__selectQueries[static::class] = (new self::$allowedType())::__getQuerySelectWithoutWhere();
+//            return;
+//        }
+//        self::$__selectQueries[static::class] = self::$allowedType::__getQuerySelectWithoutWhere();
+
+        self::$__selectQueries[static::class] = (new $this->allowedType())::__getQuerySelectWithoutWhere();
     }
 
 
