@@ -75,15 +75,24 @@ abstract class __CollectionDB extends ArrayObject
         return '';
     }
 
-    protected static function __checkSqlSelect(): void
+    protected function __checkSqlSelect(): void
     {
-//        if (self::$allowedType::__getQuerySelectWithoutWhere() === ''){
-//            self::$__selectQueries[static::class] = (new self::$allowedType())::__getQuerySelectWithoutWhere();
-//            return;
-//        }
-//        self::$__selectQueries[static::class] = self::$allowedType::__getQuerySelectWithoutWhere();
+        $obj = $this->createInstanceOfAllowedType();
+        if ($obj::__getQuerySelectWithoutWhere() === '') {
+            self::$__selectQueries[static::class] = $obj::__getQuerySelectWithoutWhere();
+        }
+    }
 
-        self::$__selectQueries[static::class] = (new $this->allowedType())::__getQuerySelectWithoutWhere();
+    protected function createInstanceOfAllowedType()
+    {
+        // Verifica che la classe esista
+        if (class_exists($this->allowedType)) {
+            // Crea una nuova istanza della classe
+            $newInstance = new $this->allowedType();
+            return $newInstance;
+        } else {
+            throw new \Exception("La classe {$this->allowedType} non esiste");
+        }
     }
 
 
@@ -92,7 +101,8 @@ abstract class __CollectionDB extends ArrayObject
      */
     protected function __loadAll(): void
     {
-        self::__checkSqlSelect();
+        //self::__checkSqlSelect();
+        $this->__checkSqlSelect();
 
         // load record from DB
         $db = ConfigConnection::CreateDBInstance();
@@ -116,7 +126,8 @@ abstract class __CollectionDB extends ArrayObject
      */
     protected function __loadWithWhere(string $whereQuery, ?array $params = null): void
     {
-        self::__checkSqlSelect();
+        //self::__checkSqlSelect();
+        $this->__checkSqlSelect();
 
         $queryToLoad = Utility::addWhereInQuery(self::__getQuerySelect(), $whereQuery);
 
