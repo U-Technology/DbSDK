@@ -77,10 +77,23 @@ abstract class __CollectionDB extends ArrayObject
 
     protected function __checkSqlSelect(): void
     {
+        $this->checkSqlSelect(false);
+    }
+
+    private function checkSqlSelect(bool $returnInstance){
         $obj = $this->createInstanceOfAllowedType();
         if ($obj::__getQuerySelectWithoutWhere() === '') {
             self::$__selectQueries[static::class] = $obj::__getQuerySelectWithoutWhere();
         }
+
+        if ($returnInstance)
+            return $obj;
+
+        return null;
+    }
+
+    private function getInstance(){
+        return $this->checkSqlSelect(true);
     }
 
     protected function createInstanceOfAllowedType()
@@ -148,6 +161,10 @@ abstract class __CollectionDB extends ArrayObject
 
         $db = null;
     }
+
+//    protected static function __select(){
+//        $obj = $this->getInstance();
+//    }
 
 
     /**Save collection object in DB

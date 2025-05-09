@@ -10,6 +10,7 @@ use UTechnology\DbSDK\Attribute\MySQL\IsAutoIncrement;
 use UTechnology\DbSDK\Attribute\MySQL\IsPrimaryKeyField;
 use UTechnology\DbSDK\DAL\IDatabase;
 use UTechnology\DbSDK\DAL\Utility;
+use UTechnology\DbSDK\QueryBuilder\QueryBuilder;
 
 abstract class __EntityDB
 {
@@ -476,5 +477,9 @@ abstract class __EntityDB
             $db = null;
         }
 
+    }
+
+    protected static function __select(){
+        return new QueryBuilder(static::class);
     }
 }
